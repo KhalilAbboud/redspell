@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+.DS_Store
+# large artifacts stay out of git (use Drive / HF Hub)
+models/*
+!models/.gitkeep
+data/*
+!data/.gitkeep
+checkpoints/
