@@ -6,12 +6,19 @@ from pathlib import Path
 PREFIX = "grammar: "          # must match the prefix used in training
 MAX_SRC, MAX_NEW = 128, 128   # tokens
 _SPLIT = re.compile(r"((?<=[.!?])\s+|\n+)")   # sentence/paragraph boundaries, kept as separators
-_QUOTES = str.maketrans({"\u2019": "'", "\u2018": "'", "\u201c": '"', "\u201d": '"', "\u2013": "-", "\u2014": "-"})
+_QUOTES = str.maketrans({"\u2019": "'", "\u2018": "'", "\u201c": '"', "\u201d": '"', "\u2013": "-", "\u2014": "-", "\u0060": "'", "\u00b4": "'"})
 
 
 def normalize(text: str) -> str:
     """The model was trained on ASCII text: map curly quotes and dashes to plain ones."""
     return text.translate(_QUOTES)
+
+_CONTRACTION = re.compile(r"(\w)\s?[`´'’]\s?(t|s|m|d|ll|re|ve)\b", re.I)
+
+def clean_output(text: str) -> str:
+    """Repair contractions the model learned in broken form: "do n't", "don 't", "don`t" -> "don't"."""
+    text = re.sub(r"\b(\w+)\s+n't\b", r"\1n't", text)
+    return _CONTRACTION.sub(r"\1'\2", text)
 
 
 def split_text(text: str) -> list:
@@ -78,7 +85,7 @@ class Corrector:
                                padding=True, truncation=True, max_length=MAX_SRC)
                 gen = self.model.generate(**enc, num_beams=num_beams, max_new_tokens=MAX_NEW)
                 for j, t in zip(idx, self.tok.batch_decode(gen, skip_special_tokens=True)):
-                    out[j] = t
+                    out[j] = clean_output(t)
         return out
 
     def correct_text(self, text: str, num_beams: int = 4) -> str:
