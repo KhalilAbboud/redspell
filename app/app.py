@@ -1,4 +1,5 @@
 """RedSpell: grammar and spelling correction. Run from the repo root:  streamlit run app/app.py"""
+import re
 import sys
 import time
 from pathlib import Path
@@ -7,7 +8,7 @@ import streamlit as st
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from src.model.infer import Corrector, normalize          # noqa: E402
+from src.model.infer import Corrector, normalize, spell_flags          # noqa: E402
 from src.utils.diff import apply_choices, diff_ops, render_html   # noqa: E402
 
 st.set_page_config(page_title="RedSpell", page_icon="✍️", layout="wide")
@@ -46,7 +47,7 @@ if st.button("Correct", type="primary") and text.strip():
     src = normalize(text)
     t0 = time.time()
     hyp = get_corrector(model_name, quant).correct_text(src, num_beams=beams)
-    st.session_state["res"] = {"src": src, "hyp": hyp, "secs": time.time() - t0,
+    st.session_state["res"] = {"src": src, "hyp": hyp, "secs": time.time() - t0, "flags": spell_flags(src, hyp),
                                "id": st.session_state.get("res", {}).get("id", 0) + 1}
 
 res = st.session_state.get("res")
@@ -65,5 +66,16 @@ if res:
         for i in changes:
             a, b = ops[i]["a"].strip() or "∅", ops[i]["b"].strip() or "(delete)"
             accepted[i] = st.checkbox(f"{a}  →  {b}", value=True, key=f"acc_{res['id']}_{i}")
+    picks = {}
+    if res["flags"]:
+        st.subheader("Possible misspellings")
+        st.caption("Words the model left unchanged that are not in the dictionary. Suggestions are not applied unless you pick one.")
+        for f in res["flags"]:
+            pick = st.selectbox(f["word"], ["keep"] + f["suggestions"], key=f"sp_{res['id']}_{f['word']}")
+            if pick != "keep":
+                picks[f["word"]] = pick
+    final = apply_choices(ops, accepted)
+    for w, r in picks.items():
+        final = re.sub(rf"\b{re.escape(w)}\b", r, final)
     st.subheader("Final text")
-    st.code(apply_choices(ops, accepted), language=None, wrap_lines=True)
+    st.code(final, language=None, wrap_lines=True)

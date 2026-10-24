@@ -1,4 +1,5 @@
 """Load the fine-tuned T5 and correct text (runs on CPU)."""
+import importlib.resources as ir
 import re
 from pathlib import Path
 
@@ -16,6 +17,42 @@ def normalize(text: str) -> str:
 def split_text(text: str) -> list:
     """[sentence, separator, sentence, ...]; ''.join(result) == text."""
     return _SPLIT.split(text)
+
+
+_WORD = re.compile(r"[A-Za-z]+|[^A-Za-z]+")
+_sym = None
+
+
+def _get_sym():
+    global _sym
+    if _sym is None:
+        from symspellpy import SymSpell
+        _sym = SymSpell(max_dictionary_edit_distance=2, prefix_length=7)
+        _sym.load_dictionary(str(ir.files("symspellpy") / "frequency_dictionary_en_82_765.txt"), term_index=0, count_index=1)
+    return _sym
+
+
+def spell_flags(source: str, output: str) -> list:
+    """Possible misspellings the model left untouched: words present in BOTH source and output that the
+    dictionary does not know. Returns [{'word', 'suggestions'}]. Suggestions are only proposed, never auto-applied:
+    a context-free checker often ranks the wrong word first (it prefers the smallest edit distance)."""
+    from symspellpy import Verbosity
+    sym = _get_sym()
+    src_words = {w.lower() for w in _WORD.findall(source) if w[0].isalpha()}
+    flags, seen = [], set()
+    for t in _WORD.findall(output):
+        w = t.lower()
+        if (t[0].isalpha() and len(t) > 3 and not t[0].isupper() and w in src_words and w not in seen
+                and w not in sym.words
+                and not (w.endswith("nt") and w[:-2] in sym.words)):     # "dont", "shouldnt": leave contractions alone
+            seen.add(w)
+            sugg = []
+            for x in sym.lookup(w, Verbosity.ALL, max_edit_distance=2):  # sorted by distance, then frequency
+                if x.term not in sugg:
+                    sugg.append(x.term)
+            if sugg:
+                flags.append({"word": t, "suggestions": sugg[:4]})
+    return flags
 
 
 class Corrector:

@@ -3,3 +3,4 @@ streamlit
 transformers
 torch
 sentencepiece
+symspellpy
