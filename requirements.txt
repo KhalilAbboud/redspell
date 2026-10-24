@@ -1,6 +1,8 @@
-# app / local inference (training deps are installed inside the Colab notebook)
 streamlit
 transformers
 torch
 sentencepiece
 symspellpy
+pandas
+sacremoses
+openpyxl
