@@ -11,7 +11,7 @@ Test set: the official `entries.test` split of the Lang-8 English corpus v1.0 (h
 | Copy the input (floor) | 35.43 | 2.04 | 0.00 |
 | SymSpell (spelling only) | 37.46 | 3.53 | 18.51 |
 | `t5-small` (3 epochs) | 47.81 | 12.47 | 65.02 |
-| **`t5-base` (2 epochs)** | **50.95** | **15.79** | 70.87 |
+| **`t5-base` (2 epochs)** | **51.09** | **15.89** | 70.94
 
 The model was chosen on validation GLEU (1,000 validation sentences, same for both models): `t5-base` 52.26 vs `t5-small` 48.27 at the end of training. The test set was not used for any choice.
 
