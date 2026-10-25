@@ -1,12 +1,12 @@
 edit_type,gold_edits,recovered,recall_%,model_edits,matched_gold,matched_%
-phrase rewrite,83,8,9.6,25,8,32.0
+phrase rewrite,83,8,9.6,27,8,29.6
 word choice,66,8,12.1,17,8,47.1
 missing word,59,12,20.3,32,12,37.5
 word form,56,30,53.6,51,30,58.8
 extra word,32,7,21.9,17,7,41.2
 article,31,21,67.7,39,21,53.8
 preposition,24,5,20.8,26,5,19.2
-punctuation,16,1,6.2,9,1,11.1
-spelling,13,7,53.8,14,7,50.0
+punctuation,16,1,6.2,7,1,14.3
 agreement,13,6,46.2,8,6,75.0
+spelling,13,7,53.8,14,7,50.0
 casing,11,7,63.6,13,7,53.8

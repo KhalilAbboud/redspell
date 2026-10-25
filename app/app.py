@@ -31,7 +31,7 @@ if not model_dirs:
 with st.sidebar:
     st.header("Settings")
     model_name = st.selectbox("Model", model_dirs, index=model_dirs.index("t5-base") if "t5-base" in model_dirs else 0)
-    beams = st.slider("Beam size", 1, 4, 4, help="4 is what the model was evaluated with. Lower is faster on CPU.")
+    beams = st.slider("Beam size", 1, 4, 4, help="Experimental. On the test CPU it was slower and less accurate, so leave it off.")
     quant = st.checkbox("Faster on CPU (int8)", value=False, help="Quantized model: quicker, may reduce accuracy slightly.")
 
 
@@ -45,8 +45,9 @@ text = st.text_area("Paste a paragraph", height=170, placeholder=EXAMPLE)
 
 if st.button("Correct", type="primary") and text.strip():
     src = normalize(text)
+    corr = get_corrector(model_name, quant)
     t0 = time.time()
-    hyp = get_corrector(model_name, quant).correct_text(src, num_beams=beams)
+    hyp = corr.correct_text(src, num_beams=beams)
     st.session_state["res"] = {"src": src, "hyp": hyp, "secs": time.time() - t0, "flags": spell_flags(src, hyp),
                                "id": st.session_state.get("res", {}).get("id", 0) + 1}
 

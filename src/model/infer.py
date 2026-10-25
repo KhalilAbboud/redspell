@@ -14,10 +14,12 @@ def normalize(text: str) -> str:
     return text.translate(_QUOTES)
 
 _CONTRACTION = re.compile(r"(\w)\s?[`´'’]\s?(t|s|m|d|ll|re|ve)\b", re.I)
+_BROKEN_NT = re.compile(r"\b(don|doesn|didn|isn|aren|wasn|weren|couldn|wouldn|shouldn|haven|hasn|hadn|mustn|needn)\s+t\b", re.I)
 
 def clean_output(text: str) -> str:
     """Repair contractions the model learned in broken form: "do n't", "don 't", "don`t" -> "don't"."""
     text = re.sub(r"\b(\w+)\s+n't\b", r"\1n't", text)
+    text = _BROKEN_NT.sub(r"\1't", text)
     return _CONTRACTION.sub(r"\1'\2", text)
 
 
@@ -81,7 +83,7 @@ class Corrector:
         with self.torch.inference_mode():
             for i in range(0, len(order), batch_size):
                 idx = order[i:i + batch_size]
-                enc = self.tok([PREFIX + sentences[j] for j in idx], return_tensors="pt",
+                enc = self.tok([PREFIX + normalize(sentences[j]) for j in idx], return_tensors="pt",
                                padding=True, truncation=True, max_length=MAX_SRC)
                 gen = self.model.generate(**enc, num_beams=num_beams, max_new_tokens=MAX_NEW)
                 for j, t in zip(idx, self.tok.batch_decode(gen, skip_special_tokens=True)):

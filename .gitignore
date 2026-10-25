@@ -9,5 +9,5 @@ models/*
 data/*
 !data/.gitkeep
 checkpoints/
-reports/error_analysis.xlsx
-reports/error_review.xlsx
+reports/**/*.xlsx
+reports/**/error_analysis_sentences.csv
