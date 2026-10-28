@@ -11,3 +11,4 @@ data/*
 checkpoints/
 reports/**/*.xlsx
 reports/**/error_analysis_sentences.csv
+delivrables/

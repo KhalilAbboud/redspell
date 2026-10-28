@@ -2,6 +2,14 @@
 
 Grammar and spelling correction for English text (Projet 15). A T5 model is fine-tuned on real learner data (Lang-8) and served through a small Streamlit app that underlines errors, proposes corrections, and lets you accept or reject each one.
 
+## Application
+
+![Corrections: errors underlined in red, fixes in green, accept or reject each one](docs/images/screen2.png)
+![Another example of corrections](docs/images/screen1.png)
+
+![Spelling suggestions for words the model left unchanged](docs/images/screen3.png)
+
+
 ## Results
 
 Test set: the official `entries.test` split of the Lang-8 English corpus v1.0 (human corrections). GLEU is the grammatical-error-correction variant (Napoles et al., 2016).
