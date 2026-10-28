@@ -4,10 +4,9 @@ Grammar and spelling correction for English text (Projet 15). A T5 model is fine
 
 ## Application
 
-![Corrections: errors underlined in red, fixes in green, accept or reject each one](docs/images/screen2.png)
-![Another example of corrections](docs/images/screen1.png)
-
-![Spelling suggestions for words the model left unchanged](docs/images/screen3.png)
+![Corrections: errors underlined in red, fixes in green, accept or reject each one](docs/images/screen2.PNG)
+![Another example of corrections](docs/images/screen1.PNG)
+![Spelling suggestions for words the model left unchanged](docs/images/screen3.PNG)
 
 
 ## Results
